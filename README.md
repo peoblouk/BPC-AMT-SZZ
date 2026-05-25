@@ -1,7 +1,7 @@
 # Státnicové otázky BPC-AMT
 Tento repozitář a jeho funkce je založena na repozitáři s otázkami ke státní závěrečné zkoušce od oboru Informační bezpečnost na FEKT VUT. Jejich původní repozitář najdete zde: [MPC-IBE-SZZ](https://github.com/VUT-FEKT-IBE/MPC-IBE-SZZ).
 
-Státnicové předměty pro rok 2024/25 jsou následující
+Státnicové předměty pro rok 2025/26 jsou následující
 
 - [BPC-MVE](#BPC-MVE) Měření v elektrotechnice
 - [BPC-LOS](#BPC-LOS) Logické obvody a systémy
@@ -13,7 +13,7 @@ Státnicové předměty pro rok 2024/25 jsou následující
 - [BPC-UIN](#BPC-UIN) Umělá inteligence
 - [BPC-ZVS](#BPC-ZVS) Zpracování vícerozměrných signálů
 
-- [ ] Pro rok 2024/2025 je potřeba zkontrolovat/doplnit/přepsat otázky a okruhy.
+- [ ] Pro rok 2025/2026 je potřeba zkontrolovat/doplnit/přepsat otázky a okruhy.
 
 ## Seznam předmětů a jejich otázek
 
@@ -48,7 +48,7 @@ Přerušení: řadič přerušení, činnost procesoru při zahájení obsluhy p
 - [ ]  Princip a vlastnosti statických pamětí RAM (SRAM) a dynamických pamětí RAM (DRAM), synchronní paměti DRAM (SDRAM).
 Připojování paralelních pamětí SRAM, FLASH ke sběrnicím mikroprocesoru. Adresový dekodér.
 Hierarchie paměti, paměti cache, specializované paměti cache.
-- [ ] Pojem logická a fyzická adresa, ochrana paměti, memory management unit (MMU). Stránkování (princip, transformace logické adresy na fyzickou, stránkovací tabulka). Virtuální adresový prostor. Zrychlení překladu adres pomocí Translation Look-aside Buffer (TLB).
+- [ ] Zdroje hodinových impulsů pro mikrokontroléry, jejich parametry. Fázový závěs (blokové schéma, funkce, důvody použití). Princip a použití watch dog. Komunikační rozhraní UART, SPI a IIC.
 
 ### BPC-PPA
 
