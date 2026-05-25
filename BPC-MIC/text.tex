@@ -641,45 +641,21 @@ Většina moderních procesorů má alespoň 3 nezávislé cache.\\
 
 \subsection{Zdroje hodinových impulsů pro mikrokontroléry}
 Každý synchronní sekvenční logický obvod musí být taktován hodinovými impulsy.\\
-Hodinové impulsy potřebuje jádro procesoru i periferie.\\
 Hodinový kmitočet ovlivňuje výpočetní výkon, rychlost periferií, spotřebu a přesnost časování.\\
 
 \subsubsection*{Zdroje hodinového kmitočtu}
 \begin{itemize}
-    \item Externí zdroj hodin
-          \begin{itemize}
-              \item Obvykle hotový krystalový oscilátor.
-              \item Přivádí se už hotový hodinový signál na vstup mikrokontroléru.
-              \item Vysoká přesnost a stabilita, ale vyšší cena a další součástka.
-          \end{itemize}
-    \item Vnitřní RC oscilátor
-          \begin{itemize}
-              \item Součástí mikrokontroléru.
-              \item Levný, rychlý start a nepotřebuje vnější součástky.
-              \item Má horší toleranci a teplotní stabilitu, proto se hodí tam, kde není požadována přesná frekvence.
-          \end{itemize}
-    \item Vnitřní ring oscilátor
-          \begin{itemize}
-              \item Složen z lichého počtu invertorů.
-              \item Čím větší je počet hradel, tím větší je zpoždění a tím nižší je kmitočet.
-              \item Používá se hlavně po prvotní inicializaci mikrokontroléru.
-          \end{itemize}
-    \item Vnitřní krystalový oscilátor s vnějším krystalem nebo keramickým rezonátorem
-          \begin{itemize}
-              \item V mikrokontroléru je zesilovač, vně se připojí krystal/rezonátor a zatěžovací kondenzátory.
-              \item Krystal je přesný a stabilní, keramický rezonátor je levnější, menší a méně přesný.
-          \end{itemize}
+    \item Externí krystalový oscilátor – hotový signál přiveden na vstup MCU, vysoká přesnost a stabilita
+    \item Vnitřní RC oscilátor – součástí MCU, levný, rychlý start, horší tolerance a teplotní stabilita
+    \item Vnitřní ring oscilátor – lichý počet invertorů, nízká přesnost, používá se při inicializaci
+    \item Vnitřní oscilátor s vnějším krystalem/keramickým rezonátorem – přesný a stabilní, rezonátor levnější a méně přesný
 \end{itemize}
 
 \subsubsection*{Parametry zdrojů hodin}
 \begin{itemize}
-    \item Jmenovitý kmitočet - hodnota uvedená výrobcem.
-    \item Tolerance kmitočtu - maximální odchylka od jmenovité hodnoty při 25 °C.
-    \item Stabilita kmitočtu - změna kmitočtu v rozsahu pracovních teplot.
-    \item Stárnutí - pomalá změna rezonančního kmitočtu v čase, největší bývá v prvním roce provozu.
-    \item Výkonové zatížení - maximální výkon, který se smí v krystalu přeměnit na teplo.
-    \item Doba náběhu - doba, než oscilátor začne spolehlivě kmitat.
-    \item Spotřeba, cena, velikost a odolnost proti rušení.
+    \item Jmenovitý kmitočet, tolerance (odchylka při 25 °C), stabilita (rozsah teplot)
+    \item Stárnutí – pomalá změna kmitočtu v čase
+    \item Výkonové zatížení, doba náběhu, spotřeba, cena, odolnost proti rušení
 \end{itemize}
 
 \begin{figure}[h!]
@@ -687,14 +663,8 @@ Hodinový kmitočet ovlivňuje výpočetní výkon, rychlost periferií, spotře
     \includegraphics[width = 0.9\textwidth]{img/oscillator_comparison.png}
 \end{figure}
 
-Krystalový oscilátor se používá tam, kde je požadována vysoká přesnost a stabilita, například přesná časová základna nebo komunikační rozhraní s přesně danou rychlostí.\\
-RC oscilátor stačí pro jednodušší řízení, kde přesná frekvence není kritická.\\
-U bezpečnostních aplikací je vhodné krystal zálohovat RC oscilátorem, aby bylo možné při poruše hodin přejít do bezpečného stavu.\\
-
 \subsection{Fázový závěs - PLL}
-PLL (Phase Locked Loop) slouží k vytvoření výstupního hodinového kmitočtu ze vstupního kmitočtu.\\
-Umožňuje násobit nebo dělit vstupní frekvenci racionálním číslem.\\
-Výstupní kmitočet tedy může být vyšší i nižší než kmitočet vstupní.\\
+PLL (Phase Locked Loop) vytváří výstupní hodinový kmitočet ze vstupního – umožňuje násobit nebo dělit frekvenci racionálním číslem.\\
 
 \begin{figure}[h!]
     \centering
@@ -703,145 +673,61 @@ Výstupní kmitočet tedy může být vyšší i nižší než kmitočet vstupn�
 
 \subsubsection*{Části PLL}
 \begin{itemize}
-    \item Oscilátor - zdroj referenčního kmitočtu \(f_1\).
-    \item Dělič \(\div M\) - dělí referenční kmitočet.
-    \item Fázový komparátor - porovnává fázi a kmitočet referenčního signálu se zpětnovazebním signálem.
-    \item Korekční člen - filtruje výstup z komparátoru, v nejjednodušším případě RC dolní propust.
-    \item VCO - napětím řízený oscilátor, jeho kmitočet se řídí ladicím napětím.
-    \item Dělič \(\div N\) - dělí výstupní kmitočet \(f_2\) ve zpětné vazbě.
+    \item Oscilátor – referenční kmitočet \(f_1\), dělič \(\div M\)
+    \item Fázový komparátor – porovnává \(\frac{f_1}{M}\) se zpětnovazebním signálem \(\frac{f_2}{N}\)
+    \item Korekční člen – RC dolní propust filtrující výstup komparátoru
+    \item VCO – napětím řízený oscilátor, dělič \(\div N\) ve zpětné vazbě
 \end{itemize}
-
-\subsubsection*{Princip funkce}
-Fázový komparátor porovnává signál \(\frac{f_1}{M}\) se signálem \(\frac{f_2}{N}\).\\
-Pokud se signály liší ve fázi nebo v kmitočtu, vytvoří se ladicí napětí, které upraví kmitočet VCO.\\
-Po uzamčení závěsu platí:
-\begin{center}
-    \(\frac{f_1}{M} = \frac{f_2}{N}\) \quad tedy \quad \(f_2 = \frac{N}{M} f_1\)
-\end{center}
-Pro \(M = 1\) platí \(f_2 = N f_1\).\\
+Po uzamčení platí \(\frac{f_1}{M} = \frac{f_2}{N}\), tedy \(f_2 = \frac{N}{M} f_1\).\\
 
 \subsubsection*{Důvody použití PLL}
 \begin{itemize}
-    \item Krystalové a keramické rezonátory mají omezený maximální kmitočet.
-    \item Z hlediska EMC je výhodné použít vnější zdroj hodin s nižším kmitočtem.
-    \item Procesor a periferie ale často potřebují vyšší hodinový kmitočet kvůli výkonu.
-    \item Z jednoho referenčního kmitočtu lze odvodit více různých hodin pro jádro, sběrnice a periferie.
-    \item Za PLL se někdy vkládá dělič 2 pro zajištění střídy 50 \%.
+    \item Rezonátory mají omezený max. kmitočet, procesor potřebuje vyšší
+    \item Z hlediska EMC výhodné použít nižší vstupní kmitočet
+    \item Z jednoho referenčního kmitočtu lze odvodit více různých hodin pro jádro, sběrnice a periferie
 \end{itemize}
 
 \subsection{Watch dog}
-Watch dog, také COP (Computer Operating Properly), hlídá správný běh programu.\\
-Chrání systém proti tomu, aby procesor uvízl v nekonečné smyčce nebo začal vykonávat chybný kód například po rušení nebo poškození obsahu paměti.\\
+Watch dog (COP – Computer Operating Properly) hlídá správný běh programu – chrání před uvíznutím v nekonečné smyčce nebo vykonáváním chybného kódu po rušení.\\
 
 \subsubsection*{Princip}
-Watch dog je časovač/čítač, který při přetečení nebo dosažení nuly vyvolá RESET mikrokontroléru.\\
-Aby k resetu nedošlo, musí program pravidelně provést pasivaci watch dogu, běžně nazývanou krmení psa.\\
-Pasivace se provádí zápisem do příslušného registru, případně zápisem přesně definované sekvence hodnot.\\
-Krmení nemá být prováděno pouze v přerušovací rutině, protože hlavní program by mohl být zaseknutý a přerušení by watch dog stále obsluhovalo.\\
-
-\subsubsection*{Použití}
-\begin{itemize}
-    \item Automatický restart systému při zaseknutí programu.
-    \item Zvýšení spolehlivosti v průmyslových a vestavných aplikacích.
-    \item Detekce chyb vzniklých rušením, softwarovou chybou nebo hardwarovým problémem.
-    \item Některé procesory mají více watch dogů, například jeden povinně zapnutý a druhý volitelný pro uživatelský program.
-\end{itemize}
-
-\subsubsection*{Režim okna}
-V režimu okna lze watch dog pasivovat pouze v určité části časového intervalu, například v 75 až 100 \% periody.\\
-Příliš brzké i příliš pozdní krmení vyvolá reset.\\
-Tím se zvyšuje ochrana proti chybám programu, který by watch dog krmil příliš často nebo z nesprávného místa.\\
-
-\subsection{Sériová komunikační rozhraní}
-Sériová rozhraní přenášejí data postupně po bitech.\\
-Oproti paralelnímu přenosu používají menší počet vodičů, ale obvykle vyžadují přesnější časování nebo samostatný hodinový signál.\\
-Mezi běžná rozhraní mikrokontrolérů patří UART/SCI, SPI a IIC (I2C).\\
+Časovač, který při přetečení vyvolá RESET mikrokontroléru.\\
+Program musí pravidelně provádět pasivaci (krmení psa) zápisem do příslušného registru.\\
+Krmení nesmí být pouze v přerušovací rutině – hlavní program by mohl být zaseknutý.\\
+Režim okna – pasivace povolena jen ve vymezeném intervalu (např. 75–100 \% periody), příliš brzké i pozdní krmení vyvolá reset.\\
 
 \subsection{UART / SCI}
-UART (Universal Asynchronous Receiver-Transmitter) je asynchronní sériové rozhraní.\\
-Hodinový signál se mezi vysílačem a přijímačem nepřenáší, obě strany mají svůj vlastní zdroj hodin.\\
-Proto musí být na obou stranách nastavena stejná přenosová rychlost a rámec.\\
-Data lze přenášet současně oběma směry - full duplex.\\
-
-\subsubsection*{Vodiče}
-\begin{itemize}
-    \item Tx - vysílaná data.
-    \item Rx - přijímaná data.
-    \item GND - společná zem.
-\end{itemize}
-
-\subsubsection*{Datový rámec}
-Linka je v klidu v neaktivní úrovni.\\
-Přenos začíná start bitem, pokračují datové bity, volitelný paritní bit a stop bit.\\
-Datové bity se obvykle posílají od nejnižšího bitu.\\
+UART (Universal Asynchronous Receiver-Transmitter) – asynchronní sériové rozhraní, full duplex.\\
+Hodinový signál se nepřenáší, obě strany musí mít shodnou přenosovou rychlost a formát rámce.\\
+Vodiče: Tx, Rx, GND.\\
+Rámec: start bit → datové bity (od LSB) → volitelný paritní bit → stop bit.\\
+Přenosová rychlost v baudech: typicky 9600, 19200, 38400, 57600, 115200 Bd.\\
+Paritní bit pro detekci chyby 1 bitu – sudá (počet 1 sudý) nebo lichá parita.\\
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width = 0.9\textwidth]{img/uart_frame.png}
 \end{figure}
 
-\subsubsection*{Přenosová rychlost a parita}
-Přenosová rychlost se udává v baudech (Bd), tedy jako počet přenesených bitů za sekundu.\\
-Typické rychlosti jsou 9600, 19200, 38400, 57600 nebo 115200 Bd.\\
-Paritní bit slouží k jednoduché detekci chyby jednoho bitu.\\
-Používá se sudá nebo lichá parita.\\
-U sudé parity je celkový počet jedniček v datových bitech a paritním bitu sudý, u liché parity lichý.\\
-
-\subsubsection*{SCI a 9. bit}
-SCI je v podstatě označení firmy Motorola pro UART.\\
-Může mít rozšíření, například 9bitový datový mód.\\
-Devátý bit lze použít jako paritní bit, značku adresního rámce nebo uživatelsky definovanou značku.\\
-Při adresování může rámec s 9. bitem nastaveným na 1 nést adresu zařízení.\\
-Zařízení, kterému adresa nepatří, může další komunikaci ignorovat nebo přejít do úsporného režimu.\\
+SCI (označení Motoroly pro UART) – rozšíření o 9bitový mód; 9. bit lze použít jako paritní bit nebo adresní značku.\\
 
 \subsection{SPI}
-SPI (Serial Peripheral Interface) je synchronní sériové rozhraní typu master-slave.\\
-Komunikaci zahajuje vždy master a zároveň generuje hodinový signál.\\
-SPI je typicky full duplex, protože při každém taktu se zároveň posouvají data z masteru do slave a ze slave do masteru.\\
+SPI (Serial Peripheral Interface) – synchronní sériové rozhraní master-slave, typicky full duplex.\\
+Komunikaci vždy zahajuje master, který generuje hodinový signál.\\
+Vodiče: MOSI (master→slave), MISO (slave→master), SCLK (hodiny), SS/CS (výběr slave).\\
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width = \textwidth]{img/spi_princip.png}
 \end{figure}
 
-\subsubsection*{Vodiče}
-\begin{itemize}
-    \item MOSI - Master Out Slave In, data z masteru do slave.
-    \item MISO - Master In Slave Out, data ze slave do masteru.
-    \item SCLK nebo CLK - hodinový signál generovaný masterem.
-    \item SS nebo CS - Slave Select/Chip Select, výběr slave zařízení.
-\end{itemize}
-
-\subsubsection*{Princip komunikace}
-Master aktivuje příslušný signál SS.\\
-V rytmu hodin se z posuvného registru masteru vysouvají bity na MOSI a nasouvají do posuvného registru slave.\\
-Současně se bity ze slave vysouvají na MISO a nasouvají do masteru.\\
-Po 8 hodinových taktech dojde k výměně jednoho bajtu mezi oběma registry.\\
-Při více zařízeních slave má každé zařízení obvykle vlastní signál SS, ostatní signály mohou být společné.\\
-
-\subsubsection*{Vlastnosti}
-\begin{itemize}
-    \item Vysoká rychlost a jednoduchý protokol.
-    \item Neobsahuje adresaci zařízení, výběr se řeší signálem SS.
-    \item Neobsahuje potvrzování jako IIC.
-    \item Počet vodičů roste s počtem zařízení slave, pokud má každý slave vlastní SS.
-\end{itemize}
+Master aktivuje SS, v rytmu hodin probíhá výměna dat přes posuvné registry (po 8 taktech 1 bajt).\\
+Bez adresace (výběr signálem SS) a bez potvrzování (ACK). Každý slave má obvykle vlastní SS.\\
 
 \subsection{IIC / I2C}
-IIC, také I2C (Inter-Integrated Circuit), je synchronní sériová sběrnice pro komunikaci mezi integrovanými obvody.\\
-Používá pouze dva signálové vodiče a společnou zem.\\
-Na jedné sběrnici může být více zařízení slave a také více masterů.\\
-
-\subsubsection*{Vodiče}
-\begin{itemize}
-    \item SDA - Serial Data, datový vodič.
-    \item SCL - Serial Clock, hodinový vodič generovaný právě komunikujícím masterem.
-\end{itemize}
-
-Výstupy zařízení jsou připojeny jako otevřený kolektor nebo otevřený drain.\\
-Vodiče SDA a SCL jsou přes pull-up rezistory taženy do vysoké úrovně.\\
-Dominantní úroveň je nízká, protože libovolné zařízení může vodič stáhnout k zemi.\\
-Recesivní úroveň je vysoká, vzniká pouze tehdy, když žádné zařízení vodič nestahuje.\\
+IIC/I2C (Inter-Integrated Circuit) – synchronní sériová sběrnice, pouze 2 vodiče + GND, multi-master.\\
+SDA (data), SCL (hodiny). Výstupy jako otevřený kolektor/drain, pull-up na VCC.\\
+Dominantní úroveň nízká (zařízení stáhne vodič), recesivní vysoká.\\
 
 \begin{figure}[h!]
     \centering
@@ -849,33 +735,14 @@ Recesivní úroveň je vysoká, vzniká pouze tehdy, když žádné zařízení 
 \end{figure}
 
 \subsubsection*{Formát zprávy}
-Každá transakce začíná start condition generovanou masterem.\\
-Následuje adresní rámec, obvykle 7bitová adresa slave zařízení a bit R/W.\\
-Nízká úroveň bitu R/W znamená zápis masteru do slave, vysoká úroveň znamená čtení ze slave do masteru.\\
-Datový rámec má 8 bitů a každý adresní i datový rámec musí být potvrzen bitem ACK/NACK.\\
-ACK vznikne tak, že příjemce přidrží SDA v nízké úrovni.\\
+Start → 7bitová adresa + R/W → ACK → datové bajty + ACK → Stop.\\
+ACK: příjemce přidrží SDA nízko. Repeated start: nový start bez stopu (zachování sběrnice).\\
+Arbitrace: při kolizi vyhrává ten, kdo vysílá nízkou (dominantní) úroveň.\\
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width = \textwidth]{img/i2c_transfer.png}
 \end{figure}
 
-\subsubsection*{Start, stop a repeated start}
-Start condition nastane, když je SCL ve vysoké úrovni a SDA přejde z vysoké do nízké úrovně.\\
-Stop condition nastane, když je SCL ve vysoké úrovni a SDA přejde z nízké do vysoké úrovně.\\
-Repeated start je nový start bez předchozího stopu.\\
-Používá se, když master nechce uvolnit sběrnici, například při kombinaci zápisu adresy registru a následného čtení dat.\\
-
-\subsubsection*{Arbitrace a rychlosti}
-Pokud začne vysílat více masterů současně, vyhrává ten, který vysílá nízkou úroveň, protože nízká úroveň je dominantní.\\
-Master, který vyslal vysokou úroveň, ale na sběrnici čte nízkou, ztratil arbitraci a musí přestat vysílat.\\
-
-\begin{itemize}
-    \item Standard mode - 100 kb/s.
-    \item Fast mode - 400 kb/s.
-    \item High speed mode - 3.4 Mb/s.
-    \item Ultra fast mode - 5 Mb/s.
-\end{itemize}
-
-Délka sběrnice a počet zařízení jsou omezeny kapacitou vodičů.\\
-Pro standardní mód je povolena maximální kapacita sběrnice 400 pF.\\
+Rychlosti: Standard 100 kb/s, Fast 400 kb/s, High speed 3,4 Mb/s, Ultra fast 5 Mb/s.\\
+Délka sběrnice omezena kapacitou vodičů (max. 400 pF pro standard mode).\\
