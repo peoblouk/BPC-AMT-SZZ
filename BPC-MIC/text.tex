@@ -637,78 +637,112 @@ Většina moderních procesorů má alespoň 3 nezávislé cache.\\
     \item TLB cache - Translation look-aside buffer cache, zrychluje překlad fyzických adres na fyzické
 \end{itemize}
 
-\section{Pojem logická a fyzická adresa, ochrana paměti, memory management unit (MMU). Stránkování (princip, transformace logické adresy na fyzickou, stránkovací tabulka). Virtuální adresový prostor. Zrychlení překladu adres pomocí Translation Look-aside Buffer (TLB).}
+\section{Zdroje hodinových impulsů pro mikrokontroléry, jejich parametry. Fázový závěs (blokové schéma, funkce, důvody použití). Princip a použití watch dog. Komunikační rozhraní UART, SPI a IIC.}
 
-MMU - memory mamangement unit. \\
-\subsection{Abstrakce paměti}
-\subsubsection*{Žádná abstrakce paměti}
-Každý proces vidí přímo fyzickou adresu.\\
-Paměťový model s kterým pracuje uživatel je fyzická adresa - množina adres od 0 do maximální hodnoty paměti.\\
-Využívají kontroléry.\\
-\subsubsection*{Abstraktovaná paměti}
-Každý proces má svůj vlastní adresový prostor.\\
-Musí se zajistit aby stejné adresy v různých procesech odpovídaly jiným fyzickým adresám.\\
+\subsection{Zdroje hodinových impulsů pro mikrokontroléry}
+Každý synchronní sekvenční logický obvod musí být taktován hodinovými impulsy.\\
+Hodinový kmitočet ovlivňuje výpočetní výkon, rychlost periferií, spotřebu a přesnost časování.\\
 
-\subsection{Logická adresa}
-Adresa virtuální s níž pracuje programátor.\\
-U jednoduchých procesorů zajišťuje jejich generování přímo procesor. U složitějších procesorů zajišťuje MMU.
+\subsubsection*{Zdroje hodinového kmitočtu}
+\begin{itemize}
+    \item Externí krystalový oscilátor – hotový signál přiveden na vstup MCU, vysoká přesnost a stabilita
+    \item Vnitřní RC oscilátor – součástí MCU, levný, rychlý start, horší tolerance a teplotní stabilita
+    \item Vnitřní ring oscilátor – lichý počet invertorů, nízká přesnost, používá se při inicializaci
+    \item Vnitřní oscilátor s vnějším krystalem/keramickým rezonátorem – přesný a stabilní, rezonátor levnější a méně přesný
+\end{itemize}
 
-\subsection{Fyzická adresa}
-Reálná adresa na sběrnici, se kterou pracuje MMU.\\
-Na vývodech procesoru je 20-bitová fyzická adresa, která se vytváří tak, že se obsah segmentového registru posune o 4 bity doleva a k ní se lineárně přičte offset.
-Takto je vytvořen rozsah fyzických adres 0-FFFFFH (0-1MB).\\
-Vzniknou překladem logických adres v MMU.\\
-
-\subsection{Ochrana paměti}
-\subsubsection*{Segmentace}
-Mechanismus správy paměti, který odpovídá uživatelskému pohledu na paměť. \\
-Každý program obsahuje data (proměnné), instrukce (kód) a zásobník.\\
-Uvedené části programu mají svoje specifické vlastnosti a lze je považovat za relativně samostatné. Proto je lze od sebe oddělit a lze je ukládat do samostatných oblastí paměti, které nazýváme segmenty.\\
-Logická adresa segmentu je tvořena dvojicí < číslo segmentu : offset>. Číslo segmentu - určuje začáteční adresu segmentu, nachází se v příslušném segmentovém registru.\\
-Z důvodu bezpečnosti pracuje se segmentovými registry a s tabulkami hlavně operační systém, uživatelský program pouze určuje offsetovou část adresy.\\
-
-\subsubsection*{Spojitá alokace}
-Rozdělení na pevné délky paměti pro každý proces.
-Neefektivní, vznikají prázdná místa v paměti.
-
-\subsubsection*{Memory Management Unit}
-Zajišťuje oddělení logického a fyzického  adresového prostoru.\\
-Ochranu paměti - vzájemné izolování uživatelských procesů, izolování jádra OS a uživatelských procesů.\\
-Obsahuje relokační registry.\\
-Jednoduché procesory nemají MMU a pracují přímo s fyzickými adresami.\\
-
-\subsubsection*{Stránkování}
-Logický prostor je rozdělen na části stejné velikosti, takzvané stránky. Obvyklá velikost je 4KB.\\
-Fyzická paměť je rozdělena na rámce. Velikost rámce je stejná jako velikost stránky. \\
-Logická adresa se skládá z offsetu, který určuje vzdálenost od začátku stránky a čísla stránky, který určuje číslo stránky. Položky tabulky stránek určují číslo rámce.\\
-Položka obsahuje příznak přítomnosti/nepřítomnosti stránky ve fyzické paměti. Realizace pomocí jednoho bitu. Když se nenachází, generuje přerušení (page fault) a OS musí zajistit přesunutí stránky do fyzické paměti z pevného disku.\\
-Bity ochrany určují jaké operace jsou se stránkou povoleny. V jednodušším případě pouze 1 bit, 0 je R/W a 1 je pouze R. Sofistikovanější využívá 3 bity, bit povolující čtení, zápis a spouštění kódu ve stránce. \\
-Bit odkazu na stránku se nastavuje vždy když je stránka čtena, nebo je do ní zapsáno. Bit pomáhá OS rozhodnout, kterou stránku uvolnit z fyzické paměti, když jsou zaplněny všechny rámce a je požadováno do fyzické paměti umístit další stránku. \\
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale = 0.5]{img/Strankovani.png}
-\end{figure}
-
-\subsubsection*{Víceúrovňové stránkovací tabulky}
-Většina dnešních počítačových systémů umožňuje pracovat s logickým adresovým prostorem od $2^{32}$ do $2^{64}$.
-Logickou adresu o velikosti 32 bitů můžeme například rozdělit na 3 části: 10 bitové pole PT1 představující index do stránkovací tabulky první úrovně, 10 bitové pole PT2 představující index do stránkovací tabulky druhé úrovně a 12 bitový offset v rámci stránky. Stránkovací tabulka první úrovně má \(2^{10}\) = 1024 položek. Každá stránkovací tabulka druhé úrovně má také 1024 položek, přitom položka tabulky reprezentuje stránku o velikosti \(2^{12}\) = 4096 B. Každá tabulka druhé úrovně tedy reprezentuje paměťový prostor 1024*4096 = 4MiB.
+\subsubsection*{Parametry zdrojů hodin}
+\begin{itemize}
+    \item Jmenovitý kmitočet, tolerance (odchylka při 25 °C), stabilita (rozsah teplot)
+    \item Stárnutí – pomalá změna kmitočtu v čase
+    \item Výkonové zatížení, doba náběhu, spotřeba, cena, odolnost proti rušení
+\end{itemize}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale = 0.5]{img/str2.png}
+    \includegraphics[width = 0.9\textwidth]{img/oscillator_comparison.png}
 \end{figure}
 
-\subsubsection*{Virtuální adresový prostor}
-Oddělení uživatelské logické paměti od fyzické paměti.\\
-Metoda zvětšení fyzické paměti ukládáním na pevný disk.\\
-Získáme větší prostor než kolik je velikost RAM. Ukládání je velmi pomalé, proto ukládáme pouze to co se nevejde do RAM, nebo je velmi malé.\\
-U virtuální paměti se ukládají jen části procesů, kdyby šlo o swapping tak se ukládají celé procesy.\\
+\subsection{Fázový závěs - PLL}
+PLL (Phase Locked Loop) vytváří výstupní hodinový kmitočet ze vstupního – umožňuje násobit nebo dělit frekvenci racionálním číslem.\\
 
-\subsubsection*{Translation look-aside buffer}
-Slouží ke zrychlení překladu logické adresy na fyzickou. \\
-Bez TLB se musíme podívat do paměti 2x, podívání do stránkovací tabulky a podívání do paměti.\\
-Typ cache paměti.\\
-Jsou v něm uloženy posledně používané lineární adresy a jejich odpovídající fyzické adresy.\\
-Nová adresa se prvně hledá v TLB.\\
-Většina programů provádí velké množství odkazů do malého počtu stránek.\\
-Je součástí MMU.\\
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width = \textwidth]{img/pll_block.png}
+\end{figure}
+
+\subsubsection*{Části PLL}
+\begin{itemize}
+    \item Oscilátor – referenční kmitočet \(f_1\), dělič \(\div M\)
+    \item Fázový komparátor – porovnává \(\frac{f_1}{M}\) se zpětnovazebním signálem \(\frac{f_2}{N}\)
+    \item Korekční člen – RC dolní propust filtrující výstup komparátoru
+    \item VCO – napětím řízený oscilátor, dělič \(\div N\) ve zpětné vazbě
+\end{itemize}
+Po uzamčení platí \(\frac{f_1}{M} = \frac{f_2}{N}\), tedy \(f_2 = \frac{N}{M} f_1\).\\
+
+\subsubsection*{Důvody použití PLL}
+\begin{itemize}
+    \item Rezonátory mají omezený max. kmitočet, procesor potřebuje vyšší
+    \item Z hlediska EMC výhodné použít nižší vstupní kmitočet
+    \item Z jednoho referenčního kmitočtu lze odvodit více různých hodin pro jádro, sběrnice a periferie
+\end{itemize}
+
+\subsection{Watch dog}
+Watch dog (COP – Computer Operating Properly) hlídá správný běh programu – chrání před uvíznutím v nekonečné smyčce nebo vykonáváním chybného kódu po rušení.\\
+
+\subsubsection*{Princip}
+Časovač, který při přetečení vyvolá RESET mikrokontroléru.\\
+Program musí pravidelně provádět pasivaci (krmení psa) zápisem do příslušného registru.\\
+Krmení nesmí být pouze v přerušovací rutině – hlavní program by mohl být zaseknutý.\\
+Režim okna – pasivace povolena jen ve vymezeném intervalu (např. 75–100 \% periody), příliš brzké i pozdní krmení vyvolá reset.\\
+
+\subsection{UART / SCI}
+UART (Universal Asynchronous Receiver-Transmitter) – asynchronní sériové rozhraní, full duplex.\\
+Hodinový signál se nepřenáší, obě strany musí mít shodnou přenosovou rychlost a formát rámce.\\
+Vodiče: Tx, Rx, GND.\\
+Rámec: start bit → datové bity (od LSB) → volitelný paritní bit → stop bit.\\
+Přenosová rychlost v baudech: typicky 9600, 19200, 38400, 57600, 115200 Bd.\\
+Paritní bit pro detekci chyby 1 bitu – sudá (počet 1 sudý) nebo lichá parita.\\
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width = 0.9\textwidth]{img/uart_frame.png}
+\end{figure}
+
+SCI (označení Motoroly pro UART) – rozšíření o 9bitový mód; 9. bit lze použít jako paritní bit nebo adresní značku.\\
+
+\subsection{SPI}
+SPI (Serial Peripheral Interface) – synchronní sériové rozhraní master-slave, typicky full duplex.\\
+Komunikaci vždy zahajuje master, který generuje hodinový signál.\\
+Vodiče: MOSI (master→slave), MISO (slave→master), SCLK (hodiny), SS/CS (výběr slave).\\
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width = \textwidth]{img/spi_princip.png}
+\end{figure}
+
+Master aktivuje SS, v rytmu hodin probíhá výměna dat přes posuvné registry (po 8 taktech 1 bajt).\\
+Bez adresace (výběr signálem SS) a bez potvrzování (ACK). Každý slave má obvykle vlastní SS.\\
+
+\subsection{IIC / I2C}
+IIC/I2C (Inter-Integrated Circuit) – synchronní sériová sběrnice, pouze 2 vodiče + GND, multi-master.\\
+SDA (data), SCL (hodiny). Výstupy jako otevřený kolektor/drain, pull-up na VCC.\\
+Dominantní úroveň nízká (zařízení stáhne vodič), recesivní vysoká.\\
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width = 0.65\textwidth]{img/i2c_bus.png}
+\end{figure}
+
+\subsubsection*{Formát zprávy}
+Start → 7bitová adresa + R/W → ACK → datové bajty + ACK → Stop.\\
+ACK: příjemce přidrží SDA nízko. Repeated start: nový start bez stopu (zachování sběrnice).\\
+Arbitrace: při kolizi vyhrává ten, kdo vysílá nízkou (dominantní) úroveň.\\
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width = \textwidth]{img/i2c_transfer.png}
+\end{figure}
+
+Rychlosti: Standard 100 kb/s, Fast 400 kb/s, High speed 3,4 Mb/s, Ultra fast 5 Mb/s.\\
+Délka sběrnice omezena kapacitou vodičů (max. 400 pF pro standard mode).\\
